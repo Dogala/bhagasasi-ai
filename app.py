@@ -12,21 +12,16 @@ st.set_page_config(
 # --- CUSTOM CSS: TAMPILAN MODERN, BERSIH & BEBAS GANGGUAN ---
 st.markdown("""
     <style>
-    /* Latar belakang utama */
     .stApp {
         background-color: #0b0e14;
         color: #e6edf3;
     }
-    
-    /* Memperbaiki warna teks input chat agar terlihat sangat jelas saat mengetik (Putih) */
     .stChatInput input {
         color: #ffffff !important;
         background-color: #161b22 !important;
         border: 1px solid #30363d !important;
         border-radius: 10px !important;
     }
-    
-    /* Styling gelembung chat */
     .stChatMessage {
         padding: 1.2rem;
         border-radius: 14px;
@@ -34,19 +29,13 @@ st.markdown("""
         border: 1px solid #21262d;
         background-color: #161b22;
     }
-    
-    /* Sidebar Styling */
     [data-testid="stSidebar"] {
         background-color: #0d1117;
         border-right: 1px solid #21262d;
     }
-    
-    /* Menyembunyikan elemen bawaan Streamlit yang mengganggu di pojok layar */
     [data-testid="stStatusWidget"] { display: none !important; }
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
-    
-    /* Styling Tombol */
     .stButton button {
         border-radius: 8px;
         font-weight: 600;
@@ -73,10 +62,9 @@ except Exception:
     st.info("Silakan masukkan GROQ_API_KEY di menu App settings -> Secrets.")
     st.stop()
 
-# Inisialisasi Client Groq Resmi
 client = Groq(api_key=api_key)
 
-# Pilihan Mode Persona (Fleksibel & Universal)
+# Pilihan Mode Persona
 mode_persona = st.sidebar.selectbox(
     "Spesialisasi / Mode AI:",
     [
@@ -88,12 +76,12 @@ mode_persona = st.sidebar.selectbox(
     index=0
 )
 
-# Menggunakan model standar produksi Groq yang paling stabil
+# Pilihan Model Bersih Tanpa Karakter Spasi Tersembunyi
 selected_model = st.sidebar.selectbox(
     "Engine Model AI:",
     [
-        "llama-3.3-70b-versatile",
-        "llama-3.1-8b-instant"
+        "llama-3.1-8b-instant",
+        "mixtral-8x7b-32768"
     ],
     index=0
 )
