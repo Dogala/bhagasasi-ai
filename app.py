@@ -12,13 +12,13 @@ st.set_page_config(
 st.sidebar.title("🛡️ Zero-Day & PoC Core")
 st.sidebar.markdown("---")
 
-api_key = st.sidebar.text_input("Groq API Key:", type="password")
-if not api_key:
-    if "GROQ_API_KEY" in st.secrets:
-        api_key = st.secrets["GROQ_API_KEY"]
-    else:
-        st.info("Masukkan Groq API Key di sidebar untuk mengaktifkan modul.")
-        st.stop()
+# Mengambil API Key secara aman dari Streamlit Secrets
+try:
+    api_key = st.secrets["GROQ_API_KEY"]
+except Exception:
+    st.sidebar.error("API Key belum disetting di Streamlit Secrets!")
+    st.info("Silakan masukkan GROQ_API_KEY di menu App settings -> Secrets.")
+    st.stop()
 
 client = OpenAI(base_url="https://api.groq.com/openai/v1", api_key=api_key)
 
