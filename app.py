@@ -1,30 +1,79 @@
 import streamlit as st
 from openai import OpenAI
 
-# Konfigurasi Halaman
+# Konfigurasi Halaman & Tema Global
 st.set_page_config(
-    page_title="Bhagasasi_MawarSec (Zero-Day & PoC Core)",
+    page_title="Bhagasasi_MawarSec | AI Cybersecurity & PoC Core",
     page_icon="🛡️",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
+# --- CUSTOM CSS UNTUK TAMPILAN PROFESIONAL (GAYA AI KELAS DUNIA) ---
+st.markdown("""
+    <style>
+    /* Mengatur latar belakang utama agar bersih */
+    .stApp {
+        background-color: #0e1117;
+        color: #e6edf3;
+    }
+    
+    /* Styling area chat agar mirip ChatGPT/Claude */
+    .stChatMessage {
+        padding: 1rem;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        border: 1px solid #30363d;
+    }
+    
+    /* Kustomisasi Sidebar agar lebih elegan */
+    [data-testid="stSidebar"] {
+        background-color: #161b22;
+        border-right: 1px solid #30363d;
+    }
+    
+    /* Tombol dan Form */
+    .stButton button {
+        border-radius: 8px;
+        font-weight: 600;
+        width: 100%;
+    }
+    
+    /* Judul Utama */
+    h1 {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 # Sidebar Konfigurasi & PoC Generator
-st.sidebar.title("🛡️ Zero-Day & PoC Core")
+st.sidebar.title("🛡️ Bhagasasi Core")
+st.sidebar.markdown("<p style='color: #8b949e; font-size: 13px;'>Advanced Zero-Day & PoC Framework</p>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
 # Mengambil API Key secara aman dari Streamlit Secrets
 try:
     api_key = st.secrets["GROQ_API_KEY"]
 except Exception:
-    st.sidebar.error("API Key belum disetting di Streamlit Secrets!")
+    st.sidebar.error("⚠️ API Key belum disetting di Streamlit Secrets!")
     st.info("Silakan masukkan GROQ_API_KEY di menu App settings -> Secrets.")
     st.stop()
 
 client = OpenAI(base_url="https://api.groq.com/openai/v1", api_key=api_key)
 
+# Pilihan Engine Model
 selected_model = st.sidebar.selectbox(
-    "Pilih Engine Model:",
-    ["llama-3.3-70b-versatile", "mixtral-8x7b-32768"],
+    "Engine Model AI:",
+    [
+        "llama-3.3-70b-versatile",
+        "llama-3.1-70b-versatile",
+        "llama-3.1-8b-instant",
+        "llama3-70b-8192",
+        "llama3-8b-8192",
+        "mixtral-8x7b-32768"
+    ],
     index=0
 )
 
@@ -42,8 +91,9 @@ with st.sidebar.form("poc_form"):
     target_endpoint = st.text_input("Target URL / Endpoint:", placeholder="https://target.com/api/v1/user")
     param_name = st.text_input("Parameter Rentan:", placeholder="id / user_input")
     
-    generate_poc_btn = st.form_submit_button("Buat Kerangka PoC")
+    generate_poc_btn = st.form_submit_button("🚀 Buat Kerangka PoC")
 
+st.sidebar.markdown("---")
 if st.sidebar.button("🗑️ Reset Sesi Percakapan"):
     st.session_state.messages = []
     st.rerun()
@@ -66,8 +116,10 @@ SYSTEM_INSTRUCTION = (
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-st.title("🛡️ Bhagasasi_MawarSec - Zero-Day & PoC Engine")
-st.caption("Advanced Vulnerability Analysis, Logic Flaw & Automated PoC Generation")
+# Header Utama Tampilan Bersih & Profesional
+st.title("🛡️ Bhagasasi_MawarSec")
+st.markdown("<p style='color: #8b949e; margin-top: -15px;'>Autonomous Vulnerability Research, Logic Flaw Analysis & Automated PoC Generation Engine</p>", unsafe_allow_html=True)
+st.markdown("---")
 
 # Jika tombol PoC Generator di sidebar ditekan, masukkan prompt otomatis ke session state
 if generate_poc_btn:
@@ -84,7 +136,7 @@ if generate_poc_btn:
         )
         st.session_state.messages.append({"role": "user", "content": poc_prompt})
 
-# Tampilkan Riwayat Chat
+# Tampilkan Riwayat Chat dengan Elemen Visual Profesional
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
