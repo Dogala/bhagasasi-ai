@@ -75,7 +75,7 @@ except Exception:
 
 client = OpenAI(base_url="https://api.groq.com/openai/v1", api_key=api_key)
 
-# Pilihan Mode Persona (Memberikan Kebebasan Ekspresi)
+# Pilihan Mode Persona
 mode_persona = st.sidebar.selectbox(
     "Spesialisasi / Mode AI:",
     [
@@ -87,12 +87,12 @@ mode_persona = st.sidebar.selectbox(
     index=0
 )
 
+# Menggunakan model aktif terbaru yang didukung Groq
 selected_model = st.sidebar.selectbox(
     "Engine Model AI:",
     [
         "llama-3.3-70b-versatile",
-        "llama3-70b-8192",
-        "llama3-8b-8192",
+        "llama-3.1-8b-instant",
         "mixtral-8x7b-32768"
     ],
     index=0
