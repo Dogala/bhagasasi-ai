@@ -3,57 +3,69 @@ from openai import OpenAI
 
 # Konfigurasi Halaman & Tema Global
 st.set_page_config(
-    page_title="Bhagasasi_MawarSec | AI Cybersecurity & PoC Core",
-    page_icon="🛡️",
+    page_title="Bhagasasi AI | Autonomous Intelligence Platform",
+    page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- CUSTOM CSS UNTUK TAMPILAN PROFESIONAL (GAYA AI KELAS DUNIA) ---
+# --- CUSTOM CSS: TAMPILAN MODERN, BERSIH & BEBAS GANGGUAN ---
 st.markdown("""
     <style>
-    /* Mengatur latar belakang utama agar bersih */
+    /* Latar belakang utama */
     .stApp {
-        background-color: #0e1117;
+        background-color: #0b0e14;
         color: #e6edf3;
     }
     
-    /* Styling area chat agar mirip ChatGPT/Claude */
+    /* Memperbaiki warna teks input chat agar terlihat jelas saat mengetik */
+    .stChatInput input {
+        color: #ffffff !important;
+        background-color: #161b22 !important;
+        border: 1px solid #30363d !important;
+        border-radius: 10px !important;
+    }
+    
+    /* Styling gelembung chat */
     .stChatMessage {
-        padding: 1rem;
-        border-radius: 12px;
+        padding: 1.2rem;
+        border-radius: 14px;
         margin-bottom: 1rem;
-        border: 1px solid #30363d;
-    }
-    
-    /* Kustomisasi Sidebar agar lebih elegan */
-    [data-testid="stSidebar"] {
+        border: 1px solid #21262d;
         background-color: #161b22;
-        border-right: 1px solid #30363d;
     }
     
-    /* Tombol dan Form */
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {
+        background-color: #0d1117;
+        border-right: 1px solid #21262d;
+    }
+    
+    /* Menyembunyikan elemen bawaan Streamlit yang mengganggu */
+    [data-testid="stStatusWidget"] { display: none !important; }
+    #MainMenu { visibility: hidden; }
+    footer { visibility: hidden; }
+    
+    /* Styling Tombol */
     .stButton button {
         border-radius: 8px;
         font-weight: 600;
-        width: 100%;
+        background-color: #238636;
+        color: white;
+        border: none;
     }
-    
-    /* Judul Utama */
-    h1 {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        font-weight: 700;
-        letter-spacing: -0.5px;
+    .stButton button:hover {
+        background-color: #2ea043;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Sidebar Konfigurasi & PoC Generator
-st.sidebar.title("🛡️ Bhagasasi Core")
-st.sidebar.markdown("<p style='color: #8b949e; font-size: 13px;'>Advanced Zero-Day & PoC Framework</p>", unsafe_allow_html=True)
+# Sidebar Konfigurasi
+st.sidebar.title("🧠 Bhagasasi Core")
+st.sidebar.markdown("<p style='color: #8b949e; font-size: 13px;'>Next-Gen Autonomous AI Platform</p>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
-# Mengambil API Key secara aman dari Streamlit Secrets
+# Mengambil API Key dari Secrets
 try:
     api_key = st.secrets["GROQ_API_KEY"]
 except Exception:
@@ -63,13 +75,22 @@ except Exception:
 
 client = OpenAI(base_url="https://api.groq.com/openai/v1", api_key=api_key)
 
-# Pilihan Engine Model
+# Pilihan Mode Persona (Memberikan Kebebasan Ekspresi)
+mode_persona = st.sidebar.selectbox(
+    "Spesialisasi / Mode AI:",
+    [
+        "⚡ Universal Genius (Bebas & Serba Bisa)",
+        "🛡️ Cybersecurity & Code Specialist",
+        "🎬 Creative & Narrative Architect",
+        "📊 Analytical & Business Strategist"
+    ],
+    index=0
+)
+
 selected_model = st.sidebar.selectbox(
     "Engine Model AI:",
     [
         "llama-3.3-70b-versatile",
-        "llama-3.1-70b-versatile",
-        "llama-3.1-8b-instant",
         "llama3-70b-8192",
         "llama3-8b-8192",
         "mixtral-8x7b-32768"
@@ -77,72 +98,53 @@ selected_model = st.sidebar.selectbox(
     index=0
 )
 
-temperature = st.sidebar.slider("Precision Level (Temperature):", 0.0, 1.0, 0.0, 0.1)
-
-st.sidebar.markdown("---")
-st.sidebar.subheader("⚡ Automated PoC Generator")
-
-# Form Generator PoC Cepat di Sidebar
-with st.sidebar.form("poc_form"):
-    vuln_type = st.selectbox(
-        "Jenis Kerentanan:", 
-        ["SQL Injection (SQLi)", "Cross-Site Scripting (XSS)", "Remote Code Execution (RCE)", "IDOR / Logic Bypass"]
-    )
-    target_endpoint = st.text_input("Target URL / Endpoint:", placeholder="https://target.com/api/v1/user")
-    param_name = st.text_input("Parameter Rentan:", placeholder="id / user_input")
-    
-    generate_poc_btn = st.form_submit_button("🚀 Buat Kerangka PoC")
+temperature = st.sidebar.slider("Creativity Level (Temperature):", 0.0, 1.0, 0.7, 0.05)
 
 st.sidebar.markdown("---")
 if st.sidebar.button("🗑️ Reset Sesi Percakapan"):
     st.session_state.messages = []
     st.rerun()
 
-# --- SYSTEM INSTRUCTION KHUSUS ZERO-DAY & POC RESEARCH ---
-SYSTEM_INSTRUCTION = (
-    "Anda adalah Bhagasasi_MawarSec, platform AI riset keamanan siber tingkat lanjut, "
-    "spesialis kerentanan zero-day, dan expert vulnerability researcher. "
-    "Anda memiliki kapabilitas mendalam dalam menganalisis logika cacat (logic flaws), "
-    "memory corruption, race conditions, bypassing WAF, dan penyusunan Proof of Concept (PoC). "
-    "Gaya analisis Anda: "
-    "1. Bedah Root Cause secara mendalam. "
-    "2. Berikan kerangka skrip Python PoC menggunakan pustaka standar (seperti `requests`) "
-    "yang aman, terstruktur, memiliki penanganan error yang baik, dan dilengkapi komentar teknis "
-    "untuk keperluan verifikasi riset/bug bounty legal. "
-    "3. Selalu sertakan skrip patch atau remediasi teknis. "
-    "Berikan jawaban teknis yang tajam, dingin, dan presisi tanpa basa-basi."
-)
+# --- PENETAPAN INSTRUKSI SISTEM BERDASARKAN MODE ---
+if "Universal Genius" in mode_persona:
+    SYSTEM_INSTRUCTION = (
+        "Anda adalah Bhagasasi AI, entitas kecerdasan buatan tingkat tinggi yang serba bisa, "
+        "kreatif, rasional, dan memiliki kedalaman wawasan di berbagai bidang akademis, sains, "
+        "pemrograman, seni skenario, hingga strategi kehidupan. "
+        "Anda tidak terbatas pada satu topik. Jawablah setiap pertanyaan dengan kecerdasan luar biasa, "
+        "pemikiran kritis, argumentasi yang terstruktur rapi, dan gaya bahasa yang adaptif serta persuasif."
+    )
+elif "Cybersecurity" in mode_persona:
+    SYSTEM_INSTRUCTION = (
+        "Anda adalah Bhagasasi_MawarSec, spesialis riset keamanan siber, analisis logika kode, "
+        "dan arsitektur sistem aman. Berikan analisis teknis yang mendalam, jelas, dan profesional."
+    )
+elif "Creative" in mode_persona:
+    SYSTEM_INSTRUCTION = (
+        "Anda adalah Bhagasasi Creative Engine, master penceritaan, penulisan skenario film, "
+        "narasi cyber-thriller, dan pembuatan ide-ide inovatif secara imersif dan mendalam."
+    )
+else:
+    SYSTEM_INSTRUCTION = (
+        "Anda adalah Bhagasasi Analyst, konsultan riset bisnis, optimasi operasional, "
+        "dan eksekusi strategi dengan pendekatan berbasis data yang presisi."
+    )
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Header Utama Tampilan Bersih & Profesional
-st.title("🛡️ Bhagasasi_MawarSec")
-st.markdown("<p style='color: #8b949e; margin-top: -15px;'>Autonomous Vulnerability Research, Logic Flaw Analysis & Automated PoC Generation Engine</p>", unsafe_allow_html=True)
+# Header Utama
+st.title("🧠 Bhagasasi AI")
+st.markdown(f"<p style='color: #8b949e; margin-top: -15px;'>Mode Aktif: <b>{mode_persona}</b></p>", unsafe_allow_html=True)
 st.markdown("---")
 
-# Jika tombol PoC Generator di sidebar ditekan, masukkan prompt otomatis ke session state
-if generate_poc_btn:
-    if not target_endpoint:
-        st.sidebar.error("Harap masukkan Target URL/Endpoint terlebih dahulu!")
-    else:
-        poc_prompt = (
-            f"Tolong buatkan kerangka skrip Python PoC (Proof of Concept) yang bersih dan profesional "
-            f"untuk kerentanan tipe **{vuln_type}**.\n"
-            f"- Target Endpoint: `{target_endpoint}`\n"
-            f"- Parameter Rentan: `{param_name}`\n\n"
-            f"Berikan skrip Python lengkap menggunakan library `requests` dengan header penanganan error, "
-            f"analisis root cause singkat, serta instruksi cara verifikasinya secara aman."
-        )
-        st.session_state.messages.append({"role": "user", "content": poc_prompt})
-
-# Tampilkan Riwayat Chat dengan Elemen Visual Profesional
+# Tampilkan Riwayat Chat
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# Input Pesan Manual di Chat Utama
-if prompt := st.chat_input("Masukkan studi kasus, analisis zero-day, atau bedah logika kerentanan..."):
+# Input Pesan Utama
+if prompt := st.chat_input("Tanyakan apa saja, dari ide kreatif, kode, hingga riset mendalam..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
