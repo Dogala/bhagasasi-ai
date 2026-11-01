@@ -1,5 +1,5 @@
 import streamlit as st
-from openai import OpenAI
+from groq import Groq
 
 # Konfigurasi Halaman & Tema Global
 st.set_page_config(
@@ -18,7 +18,7 @@ st.markdown("""
         color: #e6edf3;
     }
     
-    /* Memperbaiki warna teks input chat agar terlihat jelas saat mengetik */
+    /* Memperbaiki warna teks input chat agar terlihat sangat jelas saat mengetik (Putih) */
     .stChatInput input {
         color: #ffffff !important;
         background-color: #161b22 !important;
@@ -41,7 +41,7 @@ st.markdown("""
         border-right: 1px solid #21262d;
     }
     
-    /* Menyembunyikan elemen bawaan Streamlit yang mengganggu */
+    /* Menyembunyikan elemen bawaan Streamlit yang mengganggu di pojok layar */
     [data-testid="stStatusWidget"] { display: none !important; }
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
@@ -73,9 +73,10 @@ except Exception:
     st.info("Silakan masukkan GROQ_API_KEY di menu App settings -> Secrets.")
     st.stop()
 
-client = OpenAI(base_url="https://api.groq.com/openai/v1", api_key=api_key)
+# Inisialisasi Client Groq Resmi
+client = Groq(api_key=api_key)
 
-# Pilihan Mode Persona
+# Pilihan Mode Persona (Fleksibel & Universal)
 mode_persona = st.sidebar.selectbox(
     "Spesialisasi / Mode AI:",
     [
@@ -87,13 +88,12 @@ mode_persona = st.sidebar.selectbox(
     index=0
 )
 
-# Menggunakan model aktif terbaru yang didukung Groq
+# Menggunakan model standar produksi Groq yang paling stabil
 selected_model = st.sidebar.selectbox(
     "Engine Model AI:",
     [
         "llama-3.3-70b-versatile",
-        "llama-3.1-8b-instant",
-        "mixtral-8x7b-32768"
+        "llama-3.1-8b-instant"
     ],
     index=0
 )
